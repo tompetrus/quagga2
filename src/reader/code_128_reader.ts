@@ -240,6 +240,30 @@ class Code128Reader extends BarcodeReader {
         return null;
     };
 
+    public translateCode(code:BarcodeInfo) : string | null {
+        let str = null;
+        switch (code.codeset) {
+            case this.CODE_A:
+                if (code.code < 64) {
+                    str = String.fromCharCode(32 + code.code);
+                } else if (code.code < 96) {
+                    str = String.fromCharCode(code.code - 64);
+                }
+                break;
+            case this.CODE_B:
+                if (code.code < 96) {
+                    str = String.fromCharCode(32 + code.code);
+                }
+                break;
+            case this.CODE_C:
+                if (code.code < 100) {
+                    str = code.code < 10 ? ('0' + code.code) : ('' + code.code);
+                }
+                break;
+            }
+        return str;
+    }
+
     public decode(row?: Array<number>, start?: BarcodePosition): Barcode | null {
         const startInfo = this._findStart();
         if (startInfo === null) {
@@ -266,9 +290,8 @@ class Code128Reader extends BarcodeReader {
                 space: startInfo.correction!.space,
             },
         };
-        const decodedCodes = [];
-        decodedCodes.push(code);
-        let checksum = code.code;
+        const decodedCodes: BarcodeInfo[] = [];
+
         let codeset = ((c: number) => {
             switch (c) {
                 case this.START_CODE_A:
@@ -278,16 +301,19 @@ class Code128Reader extends BarcodeReader {
                 case this.START_CODE_C:
                     return this.CODE_C;
                 default:
-                    return null;
+                    return undefined;
             }
         })(code.code);
+
+        code.codeset = codeset;
+        decodedCodes.push(code);
+        let checksum = code.code;
         let done = false;
         let shiftNext = false;
         let unshift = shiftNext;
         let removeLastCharacter = true;
         let multiplier = 0;
         let rawResult: Array<number> = [];
-        let result: Array<string | number> = []; // TODO: i think this should be string only, but it creates problems if it is
 
         while (!done) {
             unshift = shiftNext;
@@ -303,15 +329,13 @@ class Code128Reader extends BarcodeReader {
                     multiplier++;
                     checksum += multiplier * code.code;
                 }
+
+                code.codeset = codeset;
                 decodedCodes.push(code);
 
                 switch (codeset) {
                 case this.CODE_A:
-                    if (code.code < 64) {
-                        result.push(String.fromCharCode(32 + code.code));
-                    } else if (code.code < 96) {
-                        result.push(String.fromCharCode(code.code - 64));
-                    } else {
+                    if (code.code > 96) {
                         if (code.code !== this.STOP_CODE) {
                             removeLastCharacter = false;
                         }
@@ -333,9 +357,7 @@ class Code128Reader extends BarcodeReader {
                     }
                     break;
                 case this.CODE_B:
-                    if (code.code < 96) {
-                        result.push(String.fromCharCode(32 + code.code));
-                    } else {
+                    if (code.code > 96) {
                         if (code.code !== this.STOP_CODE) {
                             removeLastCharacter = false;
                         }
@@ -357,9 +379,7 @@ class Code128Reader extends BarcodeReader {
                     }
                     break;
                 case this.CODE_C:
-                    if (code.code < 100) {
-                        result.push(code.code < 10 ? '0' + code.code : code.code);
-                    } else {
+                    if (code.code > 100) {
                         if (code.code !== this.STOP_CODE) {
                             removeLastCharacter = false;
                         }
@@ -399,18 +419,29 @@ class Code128Reader extends BarcodeReader {
             return null;
         }
 
+        let resultCodes: Array<BarcodeInfo> = []
+
+        // remove last code from result (checksum)
+        if (removeLastCharacter) {
+            resultCodes = decodedCodes.slice(0, -1)
+        } else {
+            resultCodes = decodedCodes
+        }
+
+        const result: string =
+            resultCodes
+            .map(code => this.translateCode(code))
+            .filter(val => !!val)
+            .join('')
+        ;
+
         if (!result.length) {
             return null;
         }
 
-        // remove last code from result (checksum)
-        if (removeLastCharacter) {
-            result.splice(result.length - 1, 1);
-        }
-
 
         return {
-            code: result.join(''),
+            code: result,
             start: startInfo.start,
             end: code.end,
             codeset: codeset as number,
