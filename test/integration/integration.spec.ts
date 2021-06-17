@@ -133,6 +133,19 @@ describe('End-To-End Decoder Tests with Quagga.decodeSingle', () => {
         // { name: 'image-011.png', result: '33c64780-a9c0-e92a-820c-fae7011c11e2' },
     ]);
     runDecoderTest(
+        'code_128_gs1',
+        generateConfig({
+            inputStream: {
+            size: 1200,
+            singleChannel: false,
+        },
+        decoder: {
+            readers: ["code_128_gs1_reader"]
+        }
+    }), [
+        { 'name': 'image-001.jpg', 'result': '02123456789012341012345\x1D373', format: 'code_128' }
+    ]);
+    runDecoderTest(
         'code_39',
         generateConfig({
             decoder: {

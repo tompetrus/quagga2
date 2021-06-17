@@ -2,6 +2,7 @@ import BarcodeReader from './barcode_reader';
 import TwoOfFiveReader from './2of5_reader';
 import NewCodabarReader from './codabar_reader';
 import Code128Reader from './code_128_reader';
+import Code128GS1Reader from './code_128_gs1_reader';
 import Code32Reader from './code_32_reader';
 import Code39Reader from './code_39_reader';
 import Code39VINReader from './code_39_vin_reader';
@@ -19,6 +20,7 @@ export {
     TwoOfFiveReader,
     NewCodabarReader,
     Code128Reader,
+    Code128GS1Reader,
     Code32Reader,
     Code39Reader,
     Code39VINReader,
@@ -29,5 +31,5 @@ export {
     EANReader,
     I2of5Reader,
     UPCEReader,
-    UPCReader,    
+    UPCReader,
 }
