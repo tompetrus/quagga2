@@ -28,6 +28,7 @@ export interface BarcodePosition {
 
 export interface BarcodeInfo extends BarcodePosition {
     code: number,
+    codeset?: number,
     correction?: BarcodeCorrection,
 };
 
