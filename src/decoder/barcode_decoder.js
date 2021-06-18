@@ -1,6 +1,7 @@
 import Bresenham from './bresenham';
 import ImageDebug from '../common/image_debug';
 import Code128Reader from '../reader/code_128_reader';
+import Code128GS1Reader from '../reader/code_128_gs1_reader';
 import EANReader from '../reader/ean_reader';
 import Code39Reader from '../reader/code_39_reader';
 import Code39VINReader from '../reader/code_39_vin_reader';
@@ -17,6 +18,7 @@ import Code32Reader from '../reader/code_32_reader';
 
 const READERS = {
     code_128_reader: Code128Reader,
+    code_128_gs1_reader: Code128GS1Reader,
     ean_reader: EANReader,
     ean_5_reader: EAN5Reader,
     ean_2_reader: EAN2Reader,
