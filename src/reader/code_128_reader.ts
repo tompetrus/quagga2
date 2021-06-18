@@ -122,6 +122,8 @@ class Code128Reader extends BarcodeReader {
     AVG_CODE_ERROR = 0.30;
     FORMAT = 'code_128';
     MODULE_INDICES = { bar: [0, 2, 4], space: [1, 3, 5] };
+    FNC1 = 102;
+    FNC_CHAR = String.fromCharCode(29); // the ASCII "group separator"
 
     protected _decodeCode(start: number, correction?: BarcodeCorrection): BarcodeInfo | null {
         const bestMatch = {
@@ -288,6 +290,7 @@ class Code128Reader extends BarcodeReader {
         let multiplier = 0;
         let rawResult: Array<number> = [];
         let result: Array<string | number> = []; // TODO: i think this should be string only, but it creates problems if it is
+        let isGS1: Boolean = false;
 
         while (!done) {
             unshift = shiftNext;
@@ -329,6 +332,15 @@ class Code128Reader extends BarcodeReader {
                         case this.STOP_CODE:
                             done = true;
                             break;
+                        case this.FNC1:
+                            if ( result.length === 0 ) {
+                                isGS1 = true;
+                            } else {
+                                if ( isGS1 ) {
+                                    result.push(this.FNC_CHAR);
+                                }
+                            }
+                            break;
                         }
                     }
                     break;
@@ -353,6 +365,15 @@ class Code128Reader extends BarcodeReader {
                             case this.STOP_CODE:
                                 done = true;
                                 break;
+                            case this.FNC1:
+                                if ( result.length === 0 ) {
+                                    isGS1 = true;
+                                } else {
+                                    if ( isGS1 ) {
+                                        result.push(this.FNC_CHAR);
+                                    }
+                                }
+                                break;
                         }
                     }
                     break;
@@ -372,6 +393,15 @@ class Code128Reader extends BarcodeReader {
                             break;
                         case this.STOP_CODE:
                             done = true;
+                            break;
+                        case this.FNC1:
+                            if ( result.length === 0 ) {
+                                isGS1 = true;
+                            } else {
+                                if ( isGS1 ) {
+                                    result.push(this.FNC_CHAR);
+                                }
+                            }
                             break;
                         }
                     }

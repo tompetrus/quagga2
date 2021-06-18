@@ -127,6 +127,7 @@ describe('End-To-End Decoder Tests with Quagga.decodeSingle', () => {
         { 'name': 'image-008.jpg', 'result': '1020185021797280784055', format: 'code_128' },
         { 'name': 'image-009.jpg', 'result': '0001285112001000040801', format: 'code_128' },
         { 'name': 'image-010.jpg', 'result': '673023', format: 'code_128' },
+        { 'name': 'image-012.jpg', 'result': '02123456789012341012345\x1D373', format: 'code_128' },
         // TODO: need to implement having different inputStream parameters to be able to
         // read this one -- it works only with inputStream size set to 1600 presently, but
         // other samples break at that high a size.
